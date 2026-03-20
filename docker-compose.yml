@@ -1,0 +1,76 @@
+services:
+
+  database:
+    image: postgis/postgis:15-3.4-alpine
+    container_name: fusamaps_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       fusamaps_db
+      POSTGRES_USER:     fusamaps_user
+      POSTGRES_PASSWORD: fusamaps_pass_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - fusamaps_pgdata:/var/lib/postgresql/data
+      - ./backend/database/migrations/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fusamaps_user -d fusamaps_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fusamaps_net
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: fusamaps_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - fusamaps_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fusamaps_backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV:               development
+      PORT:                   3000
+      DB_HOST:                database
+      DB_PORT:                5432
+      DB_NAME:                fusamaps_db
+      DB_USER:                fusamaps_user
+      DB_PASSWORD:            fusamaps_pass_2024
+      REDIS_URL:              redis://redis:6379
+      JWT_SECRET:             fusamaps_jwt_secreto_2024
+      JWT_EXPIRES_IN:         24h
+      JWT_REFRESH_SECRET:     fusamaps_refresh_secreto_2024
+      JWT_REFRESH_EXPIRES_IN: 30d
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fusamaps_net
+
+volumes:
+  fusamaps_pgdata:
+    driver: local
+
+networks:
+  fusamaps_net:
+    driver: bridge
