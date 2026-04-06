@@ -10,12 +10,12 @@ docker-compose up --build
 ```
 Esperar hasta ver:
 ```
-🚌 FusaMaps API corriendo en http://172.18.4.168:3000
+🚌 FusaMaps API corriendo en http://localhost:3000
 ```
 
 ### 3. Verificar en el navegador:
 ```
-http://172.18.4.168:3000/health
+http://localhost:3000/health
 → {"status":"ok","app":"FusaMaps API"}
 ```
 

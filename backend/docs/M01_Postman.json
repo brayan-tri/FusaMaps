@@ -4,14 +4,14 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url",      "value": "http://172.18.4.168:3000/api" },
+    { "key": "base_url",      "value": "http://localhost:3000/api" },
     { "key": "access_token",  "value": "" },
     { "key": "refresh_token", "value": "" }
   ],
   "item": [
     {
       "name": "✅ Health Check",
-      "request": { "method": "GET", "url": "http://172.18.4.168:3000/health" }
+      "request": { "method": "GET", "url": "http://localhost:3000/health" }
     },
     {
       "name": "1. Registro",

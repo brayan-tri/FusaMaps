@@ -41,7 +41,7 @@ class _MapaPageState extends State<MapaPage> {
   Future<void> _cargarParaderos() async {
     try {
       final response = await http.get(
-        Uri.parse('http://172.18.4.168:3000/api/mapa/paraderos'),
+        Uri.parse('http://localhost:3000/api/mapa/paraderos'),
       );
       final data = jsonDecode(response.body);
       if (data['success'] == true) {

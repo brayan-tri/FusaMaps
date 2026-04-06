@@ -8,15 +8,22 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || '',
 });
 
-const connectDB = async () => {
-  try {
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    console.log('✅ PostgreSQL conectado');
-    client.release();
-  } catch (err) {
-    console.error('❌ Error PostgreSQL:', err.message);
-    process.exit(1);
+const connectDB = async (retries = 10, delay = 3000) => {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      const client = await pool.connect();
+      await client.query('SELECT 1');
+      console.log('✅ PostgreSQL conectado');
+      client.release();
+      return;
+    } catch (err) {
+      console.log(`⏳ Esperando PostgreSQL... intento ${i}/${retries}`);
+      if (i === retries) {
+        console.error('❌ No se pudo conectar a PostgreSQL');
+        process.exit(1);
+      }
+      await new Promise(res => setTimeout(res, delay));
+    }
   }
 };
 
