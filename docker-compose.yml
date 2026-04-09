@@ -74,3 +74,33 @@ volumes:
 networks:
   fusamaps_net:
     driver: bridge
+
+  admin:
+    build:
+      context: ../fusamaps_admin
+      dockerfile: Dockerfile
+    container_name: fusamaps_admin
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../fusamaps_admin:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - fusamaps_net
+    depends_on:
+      - backend
+
+  flutter_web:
+    build:
+      context: ../fusamaps_final/flutter_app
+      dockerfile: Dockerfile
+    container_name: fusamaps_flutter
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - fusamaps_net
+    depends_on:
+      - backend
